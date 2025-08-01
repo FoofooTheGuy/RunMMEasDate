@@ -6,16 +6,16 @@
 typedef void(WINAPI *InitDateProc)(FILETIME *);
 
 // Helper: write memory into remote process
-BOOL WriteRemoteMemory(HANDLE hProcess, LPVOID &pRemote, LPCVOID data, SIZE_T size)
+BOOL WriteRemoteMemory(HANDLE hProcess, LPVOID &pRemote, LPCVOID data, SIZE_T size, DWORD Protect = PAGE_READWRITE)
 {
-    pRemote = VirtualAllocEx(hProcess, NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    pRemote = VirtualAllocEx(hProcess, NULL, size, MEM_COMMIT | MEM_RESERVE, Protect);
     if (!pRemote)
         return FALSE;
     return WriteProcessMemory(hProcess, pRemote, data, size, NULL);
 }
 
 // Helper: get remote address of InitDate (trick: same offset after LoadLibrary)
-LPVOID GetRemoteProcAddress(HANDLE hProcess, HMODULE hLocalModule, const std::wstring &dllPath, const std::string &procName)
+/*LPVOID GetRemoteProcAddress(HANDLE hProcess, HMODULE hLocalModule, const std::wstring &dllPath, const std::string &procName)
 {
     HMODULE hRemoteModule = nullptr;
 
@@ -26,20 +26,54 @@ LPVOID GetRemoteProcAddress(HANDLE hProcess, HMODULE hLocalModule, const std::ws
     uintptr_t offset = localProc - localBase;
 
     return reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(hRemoteModule) + offset);
+}*/
+
+//other
+void copy_str(wchar_t *out, const wchar_t *in)
+{
+	size_t len = wcslen(in);
+	if ( len >= 260 )
+		len = 259;
+	memcpy(out, in, len * 2);
+	out[len] = 0;
+}
+
+typedef HMODULE (* my_loadLibraryW)(wchar_t *lpLibFileName);
+typedef FARPROC (* my_GetProcAddress)(HMODULE hModule, LPCSTR lpProcName);
+
+struct inject_ctx
+{
+  my_loadLibraryW this_LoadLibraryW;
+  my_GetProcAddress this_GetProcAddress;
+  wchar_t dateinject_dll_path[261];
+  char dll_entrypoint_funcname[9];
+  FILETIME datearg;
+};
+
+// Find and call the InitDate function (only for target process)
+static DWORD getInitDateFunc(inject_ctx *lpThreadParameter)
+{
+  HMODULE dateinj = lpThreadParameter->this_LoadLibraryW(lpThreadParameter->dateinject_dll_path);
+  typedef void (* initdate)(FILETIME* datearg);
+  initdate initdate_func = (initdate)lpThreadParameter->this_GetProcAddress(dateinj, lpThreadParameter->dll_entrypoint_funcname);
+  if ( initdate_func )
+    initdate_func(&lpThreadParameter->datearg);
+  return 0;
 }
 
 int main()
 {
-    // 1. Create fake FILETIME
-    SYSTEMTIME sysTime = {2023, 1, 0, 1, 0, 0, 0, 0};
+    // Create fake FILETIME
+    SYSTEMTIME sysTime = {2010, 1, 0, 1, 0, 0, 0, 0};
     FILETIME fakeFileTime;
     SystemTimeToFileTime(&sysTime, &fakeFileTime);
 
-    // 2. Target EXE and DLL path
+    // Target EXE and DLL path
     std::wstring targetExe = L"..\\bin\\Debug\\GetTime.exe";
+    //std::wstring targetExe = L"..\\bin\\Release\\GetTime.exe";
     std::wstring dllPath = L"RunAsDate.dll";
 
-    // 3. Create suspended process
+    // Create suspended process
     STARTUPINFOW si = {sizeof(si)};
     PROCESS_INFORMATION pi = {};
     if (!CreateProcessW(NULL, (LPWSTR)targetExe.c_str(), NULL, NULL, FALSE,
@@ -49,69 +83,66 @@ int main()
         return 1;
     }
 
-    // 4. Inject DLL
-    LPVOID remoteDllPath = nullptr;
-    if (!WriteRemoteMemory(pi.hProcess, remoteDllPath, dllPath.c_str(), (dllPath.length() + 1) * sizeof(wchar_t)))
-    {
-        std::cerr << "Failed to write DLL path.\n";
-        TerminateProcess(pi.hProcess, 1);
-        return 1;
-    }
+	// Get InitDate function in remote process
+	inject_ctx injection;
+	memset(&injection, 0, sizeof(inject_ctx));
+	
+	HMODULE ModuleHandleW = GetModuleHandleW(L"kernel32.dll");
+	
+	// Set up args for custom function
+	injection.this_GetProcAddress = (my_GetProcAddress)GetProcAddress(ModuleHandleW, "GetProcAddress");
+	injection.this_LoadLibraryW = (my_loadLibraryW)GetProcAddress(ModuleHandleW, "LoadLibraryW");
 
-    auto loadLibraryAddr = GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "LoadLibraryW");
-    HANDLE hThread = CreateRemoteThread(pi.hProcess, NULL, 0,
-                                        (LPTHREAD_START_ROUTINE)loadLibraryAddr, remoteDllPath, 0, NULL);
-    WaitForSingleObject(hThread, INFINITE);
-    CloseHandle(hThread);
-    VirtualFreeEx(pi.hProcess, remoteDllPath, 0, MEM_RELEASE);
+	copy_str(injection.dateinject_dll_path, dllPath.c_str());
+	strcpy(injection.dll_entrypoint_funcname, "InitDate");
+	injection.datearg = fakeFileTime;
 
-    // 5. Load DLL locally to calculate InitDate offset
-    HMODULE hLocalDll = LoadLibraryW(dllPath.c_str());
-    if (!hLocalDll)
-    {
-        std::cerr << "Failed to load local DLL.\n";
-        TerminateProcess(pi.hProcess, 1);
-        return 1;
-    }
-
-    // 6. Get InitDate address offset
-    FARPROC localInitDate = GetProcAddress(hLocalDll, "InitDate");
-    if (!localInitDate)
-    {
-        std::cerr << "Failed to find InitDate.\n";
-        TerminateProcess(pi.hProcess, 1);
-        return 1;
-    }
-
-    uintptr_t offset = (uintptr_t)localInitDate - (uintptr_t)hLocalDll;
-
-    // 7. Calculate InitDate address in remote process
-    HMODULE hRemoteDll = nullptr;
-    EnumProcessModules(pi.hProcess, (HMODULE *)&hRemoteDll, sizeof(HMODULE), NULL); // risky
-    LPVOID remoteInitDate = (LPBYTE)hRemoteDll + offset;
-
-    // 8. Write FILETIME into remote process
-    LPVOID remoteFileTime = nullptr;
-    if (!WriteRemoteMemory(pi.hProcess, remoteFileTime, &fakeFileTime, sizeof(FILETIME)))
-    {
-        std::cerr << "Failed to write FILETIME.\n";
-        TerminateProcess(pi.hProcess, 1);
-        return 1;
-    }
+	// Inject custom function + args to call InitDate
+	LPVOID remote_getInitDateFunc = nullptr;//void*
+	if (!WriteRemoteMemory(pi.hProcess, remote_getInitDateFunc, getInitDateFunc, 0x400, PAGE_EXECUTE_READWRITE))
+	{
+		std::cerr << "Failed to write function.\n";
+		TerminateProcess(pi.hProcess, 1);
+		return 1;
+	}
+	
+	LPVOID remote_getIDFuncArg = nullptr;
+	if (!WriteRemoteMemory(pi.hProcess, remote_getIDFuncArg, &injection, sizeof(inject_ctx), PAGE_EXECUTE_READWRITE))
+	{
+		std::cerr << "Failed to write args for function.\n";
+		TerminateProcess(pi.hProcess, 1);
+		return 1;
+	}
+	
+	// Call function in new thread
+	HANDLE RemoteThread = CreateRemoteThread(
+		pi.hProcess,
+		NULL,
+		0,
+		(LPTHREAD_START_ROUTINE)remote_getInitDateFunc,
+		remote_getIDFuncArg,
+		4,
+		NULL);
+	if (RemoteThread)
+	{
+		ResumeThread(RemoteThread);
+		WaitForSingleObject(RemoteThread, INFINITE);
+		CloseHandle(RemoteThread);
+	}
 
     // 9. Call InitDate(FILETIME*) in remote process
-    HANDLE hInitThread = CreateRemoteThread(pi.hProcess, NULL, 0,
+    /*HANDLE hInitThread = CreateRemoteThread(pi.hProcess, NULL, 0,
                                             (LPTHREAD_START_ROUTINE)remoteInitDate, remoteFileTime, 0, NULL);
     WaitForSingleObject(hInitThread, INFINITE);
-    CloseHandle(hInitThread);
+    CloseHandle(hInitThread);*/
 
-    // 10. Resume main thread
+    // Resume main thread
     ResumeThread(pi.hThread);
 
     // Cleanup
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
-    FreeLibrary(hLocalDll);
+    //FreeLibrary(hLocalDll);
 
     std::cout << "Target process started with fake date injected!\n";
     return 0;
