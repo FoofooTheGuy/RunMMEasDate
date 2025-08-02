@@ -54,7 +54,7 @@ extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime)
 	if (MH_Initialize() != MH_OK)
 		return;
 	
-	//GetLocalTime
+	// GetLocalTime
 	OutputDebugStringW(L"[RunAsDate] Create Hook GetLocalTime");
 	if (MH_CreateHook(&GetLocalTime, &MyGetLocalTime, reinterpret_cast<LPVOID *>(&original_GetLocalTime)) != MH_OK)
 		return;
@@ -63,7 +63,7 @@ extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime)
 	if (MH_EnableHook(&GetLocalTime) != MH_OK)
 		return;
 
-	//GetSystemTime
+	// GetSystemTime
 	OutputDebugStringW(L"[RunAsDate] Create Hook GetSystemTime");
 	if (MH_CreateHook(&GetSystemTime, &MyGetSystemTime, reinterpret_cast<LPVOID *>(&original_GetSystemTime)) != MH_OK)
 		return;
@@ -72,7 +72,7 @@ extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime)
 	if (MH_EnableHook(&GetSystemTime) != MH_OK)
 		return;
 	
-	//GetSystemTimeAsFileTime
+	// GetSystemTimeAsFileTime
 	OutputDebugStringW(L"[RunAsDate] Create Hook GetSystemTimeAsFileTime");
 	if (MH_CreateHook(&GetSystemTimeAsFileTime, &MyGetSystemTimeAsFileTime, reinterpret_cast<LPVOID *>(&original_GetSystemTimeAsFileTime)) != MH_OK)
 		return;
@@ -81,7 +81,7 @@ extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime)
 	if (MH_EnableHook(&GetSystemTimeAsFileTime) != MH_OK)
 		return;
 
-	//GetSystemTimePreciseAsFileTime
+	// GetSystemTimePreciseAsFileTime
 	OutputDebugStringW(L"[RunAsDate] Create Hook GetSystemTimePreciseAsFileTime");
 	if (MH_CreateHook(&GetSystemTimePreciseAsFileTime, &MyGetSystemTimePreciseAsFileTime, reinterpret_cast<LPVOID *>(&original_GetSystemTimePreciseAsFileTime)) != MH_OK)
 		return;
@@ -90,7 +90,7 @@ extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime)
 	if (MH_EnableHook(&GetSystemTimePreciseAsFileTime) != MH_OK)
 		return;
 
-	//NtQuerySystemTime
+	// NtQuerySystemTime
 	/*OutputDebugStringW(L"[RunAsDate] Create Hook NtQuerySystemTime");
 	if (MH_CreateHook(&NtQuerySystemTime, &MyNtQuerySystemTime, reinterpret_cast<LPVOID *>(&original_NtQuerySystemTime)) != MH_OK)
 		return;
