@@ -1,33 +1,18 @@
-# RunAsDate
+# RunMMEasDate
+A customized version of [JackKuo-tw's](https://github.com/JackKuo-tw) [RunAsDate](https://github.com/JackKuo-tw/RunAsDate) designed to be a forwarder for Mobiclip Multicore Encoder.
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+Dependencies:
+--
+Mobiclip Multicore Encoder
 
-Welcome to the open-source version of **RunAsDate**, a tool designed to run programs with a specified date and time. This project aims to replicate and enhance the functionality of the original RunAsDate application.
+Usage:
+--
+`RunMMEasDate [PARAM]...` (Just like MME)
 
-Most of the code has been generated with assistance from AI tools like Cline (Grok-3), Gemini, and ChatGPT.
+But How?
+--
+When you run this program, it will locate MME via its environment variable, `MOBICLIP_MULTICORE_ENCODER_PATH`. It then creates the process by giving it the path to MME and the parameters given to the forwarder. Next, it injects a custom function to load a custom DLL and then it calls another custom function in the DLL, `InitDate`. `InitDate` then uses [minhook](https://github.com/TsudaKageyu/minhook/tree/565968b28583221751cc2810e09ea621745fc3a3) to override certain [Windows API Time Functions](https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-functions). Since the fake timestamp is set to 1/1/2010, every license file will work no matter what time it really is.
 
-## Table of Contents
-
-- [About](#about)
-- [Features](#features)
-- [Third Party Libraries](#third-party-libraries)
-- [References](#references)
-- [License](#license)
-
-## About
-
-RunAsDate allows you to launch applications with a custom date and time setting, which can be useful for testing software under different date conditions or bypassing time-based restrictions.
-
-## Features
-
-- Set custom date and time for application execution
-- Lightweight and easy to use
-- Open-source and customizable
-
-## Third Party Libraries
-
-- [MinHook](https://github.com/TsudaKageyu/minhook) - A Windows API hooking library used for intercepting system calls.
-
-## References
-
-- [羽夏逆向破解日记簿——RunAsDate 的实现原理分析](https://www.cnblogs.com/wingsummer/p/15340407.html)
+Other Credits
+--
+[ZeroSkill1](https://github.com/ZeroSkill1): Reverse Engineering expertise
