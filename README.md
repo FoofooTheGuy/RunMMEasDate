@@ -1,5 +1,5 @@
 # RunMMEasDate
-A customized version of [JackKuo-tw's](https://github.com/JackKuo-tw) [RunAsDate](https://github.com/JackKuo-tw/RunAsDate) designed to be a forwarder for Mobiclip Multicore Encoder.
+A customized version of [JackKuo-tw's RunAsDate](https://github.com/JackKuo-tw/RunAsDate) designed to be a forwarder for Mobiclip Multicore Encoder.
 
 Dependencies:
 --
