@@ -15,6 +15,6 @@ When you run this program, it will locate MME via its environment variable, `MOB
 
 Credits
 --
-[Nir Sofer](https://www.nirsoft.net): Inspiration and example
-[JackKuo-tw](https://github.com/JackKuo-tw): Source material
-[ZeroSkill1](https://github.com/ZeroSkill1): Reverse engineering expertise
+- [Nir Sofer](https://www.nirsoft.net): Inspiration and example
+- [JackKuo-tw](https://github.com/JackKuo-tw): Source material
+- [ZeroSkill1](https://github.com/ZeroSkill1): Reverse engineering expertise
