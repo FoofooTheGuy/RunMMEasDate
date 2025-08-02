@@ -5,27 +5,36 @@
 
 typedef void(WINAPI *InitDateProc)(FILETIME *);
 
+//https://stackoverflow.com/a/10738141
+std::wstring s2ws(const std::string& str)
+{
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+    std::wstring wstrTo( size_needed, 0 );
+    MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+    return wstrTo;
+}
+
 // Helper: write memory into remote process
 BOOL WriteRemoteMemory(HANDLE hProcess, LPVOID &pRemote, LPCVOID data, SIZE_T size, DWORD Protect = PAGE_READWRITE)
 {
-    pRemote = VirtualAllocEx(hProcess, NULL, size, MEM_COMMIT | MEM_RESERVE, Protect);
-    if (!pRemote)
-        return FALSE;
-    return WriteProcessMemory(hProcess, pRemote, data, size, NULL);
+	pRemote = VirtualAllocEx(hProcess, NULL, size, MEM_COMMIT | MEM_RESERVE, Protect);
+	if (!pRemote)
+		return FALSE;
+	return WriteProcessMemory(hProcess, pRemote, data, size, NULL);
 }
 
 // Helper: get remote address of InitDate (trick: same offset after LoadLibrary)
 /*LPVOID GetRemoteProcAddress(HANDLE hProcess, HMODULE hLocalModule, const std::wstring &dllPath, const std::string &procName)
 {
-    HMODULE hRemoteModule = nullptr;
+	HMODULE hRemoteModule = nullptr;
 
-    // This is naive but often works: assume LoadLibraryW loads DLL at same address
-    // You can also parse remote PEB but that's more complex
-    uintptr_t localBase = reinterpret_cast<uintptr_t>(hLocalModule);
-    uintptr_t localProc = reinterpret_cast<uintptr_t>(GetProcAddress(hLocalModule, procName.c_str()));
-    uintptr_t offset = localProc - localBase;
+	// This is naive but often works: assume LoadLibraryW loads DLL at same address
+	// You can also parse remote PEB but that's more complex
+	uintptr_t localBase = reinterpret_cast<uintptr_t>(hLocalModule);
+	uintptr_t localProc = reinterpret_cast<uintptr_t>(GetProcAddress(hLocalModule, procName.c_str()));
+	uintptr_t offset = localProc - localBase;
 
-    return reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(hRemoteModule) + offset);
+	return reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(hRemoteModule) + offset);
 }*/
 
 //other
@@ -57,31 +66,49 @@ static DWORD getInitDateFunc(inject_ctx *lpThreadParameter)
   typedef void (* initdate)(FILETIME* datearg);
   initdate initdate_func = (initdate)lpThreadParameter->this_GetProcAddress(dateinj, lpThreadParameter->dll_entrypoint_funcname);
   if ( initdate_func )
-    initdate_func(&lpThreadParameter->datearg);
+	initdate_func(&lpThreadParameter->datearg);
   return 0;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-    // Create fake FILETIME
-    SYSTEMTIME sysTime = {2010, 1, 0, 1, 0, 0, 0, 0};
-    FILETIME fakeFileTime;
-    SystemTimeToFileTime(&sysTime, &fakeFileTime);
+	// Create fake FILETIME
+	SYSTEMTIME sysTime = {2010, 1, 0, 1, 0, 0, 0, 0};
+	FILETIME fakeFileTime;
+	SystemTimeToFileTime(&sysTime, &fakeFileTime);
 
-    // Target EXE and DLL path
-    std::wstring targetExe = L"..\\bin\\Debug\\GetTime.exe";
-    //std::wstring targetExe = L"..\\bin\\Release\\GetTime.exe";
-    std::wstring dllPath = L"RunAsDate.dll";
+	// get MME path
+	wchar_t* MMEpath;
+	size_t MMEpathLength;
+	errno_t err = _wdupenv_s( &MMEpath, &MMEpathLength, L"MOBICLIP_MULTICORE_ENCODER_PATH" );
+	if (err) {
+		std::cerr << "Failed to get MME path\n";
+		return 1;
+	}
+	
+	// MMEpath + L"\\MobiclipMulticoreEncoder.exe";
+	std::wstring CmdLine(MMEpath);
+	CmdLine += L"\\MobiclipMulticoreEncoder.exe ";
 
-    // Create suspended process
-    STARTUPINFOW si = {sizeof(si)};
-    PROCESS_INFORMATION pi = {};
-    if (!CreateProcessW(NULL, (LPWSTR)targetExe.c_str(), NULL, NULL, FALSE,
-                        CREATE_SUSPENDED, NULL, NULL, &si, &pi))
-    {
-        std::cerr << "Failed to launch target process.\n";
-        return 1;
-    }
+	// DLL path
+	std::wstring dllPath = L"DateInject.dll";
+	
+	// Forward args to CmdLine
+	for(int i = 1; i < argc; i++) {
+		CmdLine += s2ws(std::string(argv[i]));
+		CmdLine += ' ';
+	}
+	std::wcout << CmdLine << std::endl;
+
+	// Create suspended process
+	STARTUPINFOW si = {sizeof(si)};
+	PROCESS_INFORMATION pi = {};
+	if (!CreateProcessW(NULL, (LPWSTR)CmdLine.c_str(), NULL, NULL, FALSE,
+						CREATE_SUSPENDED, NULL, NULL, &si, &pi))
+	{
+		std::cerr << "Failed to launch target process.\n";
+		return 1;
+	}
 
 	// Get InitDate function in remote process
 	inject_ctx injection;
@@ -130,20 +157,14 @@ int main()
 		CloseHandle(RemoteThread);
 	}
 
-    // 9. Call InitDate(FILETIME*) in remote process
-    /*HANDLE hInitThread = CreateRemoteThread(pi.hProcess, NULL, 0,
-                                            (LPTHREAD_START_ROUTINE)remoteInitDate, remoteFileTime, 0, NULL);
-    WaitForSingleObject(hInitThread, INFINITE);
-    CloseHandle(hInitThread);*/
+	// Resume main thread
+	ResumeThread(pi.hThread);
 
-    // Resume main thread
-    ResumeThread(pi.hThread);
+	// Cleanup
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+	//FreeLibrary(hLocalDll);
 
-    // Cleanup
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-    //FreeLibrary(hLocalDll);
-
-    std::cout << "Target process started with fake date injected!\n";
-    return 0;
+	std::cout << "Target process started with fake date injected!\n";
+	return 0;
 }
