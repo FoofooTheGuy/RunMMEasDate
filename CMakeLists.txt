@@ -49,6 +49,9 @@ set(EXE_SOURCES
 # Create the executable
 add_executable(RunMMEasDate ${EXE_SOURCES})
 
+# Disable console window https://stackoverflow.com/a/58079971
+target_link_options(RunMMEasDate PRIVATE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
+
 # Link the executable to required libraries if needed
 # Currently, the main.cpp does not directly depend on MinHook, so no linking is necessary here
 # If additional dependencies are needed, they can be added with target_link_libraries
