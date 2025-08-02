@@ -14,35 +14,34 @@ decltype(&GetSystemTimePreciseAsFileTime) original_GetSystemTimePreciseAsFileTim
 //decltype(&NtQuerySystemTime) original_NtQuerySystemTime = nullptr;
 
 // Hooked functions
-void WINAPI MyGetLocalTime(LPSYSTEMTIME lpSystemTime)
-{
+// GetLocalTime
+void WINAPI MyGetLocalTime(LPSYSTEMTIME lpSystemTime) {
 	OutputDebugStringW(L"[RunAsDate] Hooked GetLocalTime called");
 	*lpSystemTime = g_fakeSystemTime;
 }
-void WINAPI MyGetSystemTime(LPSYSTEMTIME lpSystemTime)
-{
+// GetSystemTime
+void WINAPI MyGetSystemTime(LPSYSTEMTIME lpSystemTime) {
 	OutputDebugStringW(L"[RunAsDate] Hooked GetSystemTime called");
 	*lpSystemTime = g_fakeSystemTime;
 }
-void WINAPI MyGetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime)
-{
+// GetSystemTimeAsFileTime
+void WINAPI MyGetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime) {
 	OutputDebugStringW(L"[RunAsDate] Hooked GetSystemTimeAsFileTime called");
 	*lpSystemTimeAsFileTime = g_fakeFileTime;
 }
-void WINAPI MyGetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsFileTime)
-{
+// GetSystemTimePreciseAsFileTime
+void WINAPI MyGetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsFileTime) {
 	OutputDebugStringW(L"[RunAsDate] Hooked GetSystemTimePreciseAsFileTime called");
 	*lpSystemTimeAsFileTime = g_fakeFileTime;
 }
-/*ULONGLONG WINAPI MyNtQuerySystemTime(LPFILETIME SystemTime)
-{
-	OutputDebugStringW(L"[RunAsDate] Hooked GetSystemTimePreciseAsFileTime called");
+// NtQuerySystemTime
+/*ULONGLONG WINAPI MyNtQuerySystemTime(LPFILETIME SystemTime) {
+	OutputDebugStringW(L"[RunAsDate] Hooked NtQuerySystemTime called");
 	*SystemTime = g_fakeFileTime;
 }*/
 
 // Exported function to initialize fake time and hook
-extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime)
-{
+extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime) {
 	OutputDebugStringW(L"[RunAsDate] InitDate called in target process");
 	g_fakeFileTime = *pFakeTime;
 	FileTimeToSystemTime(&g_fakeFileTime, &g_fakeSystemTime);
