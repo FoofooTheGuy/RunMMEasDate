@@ -113,7 +113,7 @@ static DWORD getInitDateFunc(inject_ctx *lpThreadParameter) {
 }
 
 int main(int argc, char* argv[]) {
-	// Enable stdout when run in cmd
+	// Enable stdout when running in cmd
 	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 		// If a console is attached, redirect stdout/stderr to it
 		FILE* pConsole;

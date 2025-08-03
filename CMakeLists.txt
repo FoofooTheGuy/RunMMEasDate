@@ -28,7 +28,7 @@ set(MINHOOK_LIB minhook)
 # Create the DLL (shared library)
 add_library(DateInject SHARED ${DLL_SOURCES})
 
-# find build type for later
+# find build type for later https://stackoverflow.com/a/72330784
 target_compile_definitions(DateInject PRIVATE "DEBUG=$<IF:$<CONFIG:Debug>,1,0>")
 if (DEBUG)
 	set(BUILD_TYPE "Debug")
