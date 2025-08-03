@@ -28,12 +28,24 @@ set(MINHOOK_LIB minhook)
 # Create the DLL (shared library)
 add_library(DateInject SHARED ${DLL_SOURCES})
 
+# find build type for later
+target_compile_definitions(DateInject PRIVATE "DEBUG=$<IF:$<CONFIG:Debug>,1,0>")
+if (DEBUG)
+	set(BUILD_TYPE "Debug")
+else()
+	set(BUILD_TYPE "Release")
+endif()
+
 # Set output name for the DLL
 set_target_properties(DateInject PROPERTIES
 	OUTPUT_NAME "DateInject"
 	PREFIX ""
 	SUFFIX ".dll"
 )
+
+get_target_property(DLL_NAME DateInject OUTPUT_NAME)
+get_target_property(DLL_SUFFIX DateInject SUFFIX)
+set(DLL_NAME "${DLL_NAME}${DLL_SUFFIX}")
 
 # Include directories for the DLL
 target_include_directories(DateInject PRIVATE ${MINHOOK_INCLUDE_DIR})
@@ -50,6 +62,8 @@ set(EXE_SOURCES
 # Resources
 set(EXE_SOURCES ${EXE_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/resources/${PROJECT_NAME}.rc)
 set(RESOURCES Resources/icon.ico)
+get_filename_component(ABSOLUTE_PATH_FILE_DLL "${CMAKE_BINARY_DIR}/${BUILD_TYPE}/${DateInject}" REALPATH BASE_DIR "${CMAKE_BINARY_DIR}")
+string(REPLACE "/" "\\\\" ABSOLUTE_PATH_FILE_DLL ${ABSOLUTE_PATH_FILE_DLL})
 get_filename_component(ABSOLUTE_PATH_FILE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/Resources/icon.ico" REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 string(REPLACE "/" "\\\\" ABSOLUTE_PATH_FILE_ICON ${ABSOLUTE_PATH_FILE_ICON})
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/resources/${PROJECT_NAME}.rc
@@ -63,6 +77,7 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/resources/${PROJECT_NAME}.rc
 	"LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL\n"
 	"#pragma code_page(65001)\n"
 	"\n"
+	"DATEINJECTDLL RCDATA \"${ABSOLUTE_PATH_FILE_DLL}\\${DLL_NAME}\"\n"
 	"IDI_APPLICATION ICON DISCARDABLE \"${ABSOLUTE_PATH_FILE_ICON}\"\n\n"
 	"VS_VERSION_INFO VERSIONINFO\n"
 	" FILEVERSION 1,0,0,0\n"

@@ -20,6 +20,36 @@ BOOL WriteRemoteMemory(HANDLE hProcess, LPVOID &pRemote, LPCVOID data, SIZE_T si
 	return WriteProcessMemory(hProcess, pRemote, data, size, NULL);
 }
 
+// Return non-zero if failed
+DWORD WriteResourceToFile(LPCSTR lpszResourceName, LPCSTR lpszResourceType, LPCWSTR lpszOutputFile)
+{
+	HMODULE hModule = GetModuleHandle(NULL); // Get handle to current executable
+	if (hModule == NULL)
+		return 1;
+	HRSRC hResInfo = FindResource(hModule, lpszResourceName, lpszResourceType);
+	if (hResInfo == NULL)
+		return 2;
+	HGLOBAL hResLoad = LoadResource(hModule, hResInfo);
+	if (hResLoad == NULL)
+		return 3;
+	LPVOID lpResData = LockResource(hResLoad);
+	if (lpResData == NULL)
+		return 4;
+	DWORD dwSize = SizeofResource(hModule, hResInfo);
+	if (!dwSize)
+		return 5;
+
+	HANDLE hFile = CreateFileW(lpszOutputFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == NULL)
+		return 6;
+	if (!WriteFile(hFile, lpResData, dwSize, NULL, NULL))
+		return 7;
+
+	CloseHandle(hFile);
+	// No need to FreeResource or UnlockResource for resources loaded this way
+	return 0;
+}
+
 // This struct is only for the next two functions
 struct WindowData {
 	std::vector<HWND>* hwnds;
@@ -83,6 +113,40 @@ static DWORD getInitDateFunc(inject_ctx *lpThreadParameter) {
 }
 
 int main(int argc, char* argv[]) {
+	// Enable stdout when run in cmd
+	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
+		// If a console is attached, redirect stdout/stderr to it
+		FILE* pConsole;
+		freopen_s(&pConsole, "CONOUT$", "w", stdout);
+		freopen_s(&pConsole, "CONOUT$", "w", stderr);
+	}
+	
+	// Write DLL to temp
+	std::wstring dllPath = L"";
+	wchar_t tempPath[MAX_PATH + 1];
+	
+	DWORD tempLen = GetTempPathW(MAX_PATH, tempPath);
+	if (!tempLen)
+		return 1;
+	
+	if (tempLen + sizeof(dllPath) < MAX_PATH) {
+		wchar_t* backslash = wcsrchr(tempPath, L'\\');
+		if (backslash)
+			*backslash = L'\0';
+		dllPath = std::wstring(tempPath);
+		dllPath += L"\\DateInject.dll";
+	}
+	std::wcout << dllPath << std::endl;
+	
+	if(dllPath.empty()) {
+		std::cerr << "Failed to get Temp path\n";
+		return 1;
+	}
+	
+	DWORD WroteDLL = WriteResourceToFile("DATEINJECTDLL", RT_RCDATA, dllPath.c_str());
+	if(WroteDLL)
+		std::cerr << "Failed to write DLL: " << WroteDLL << '\n';
+	
 	// Create fake FILETIME
 	SYSTEMTIME sysTime = {2010, 1, 0, 1, 0, 0, 0, 0};
 	FILETIME fakeFileTime;
@@ -101,8 +165,6 @@ int main(int argc, char* argv[]) {
 	std::wstring CmdLine(MMEpath);
 	CmdLine += L"\\MobiclipMulticoreEncoder.exe ";
 
-	// DLL path
-	std::wstring dllPath = L"DateInject.dll";
 	
 	// Forward args to CmdLine
 	for (int i = 1; i < argc; i++) {
@@ -131,7 +193,11 @@ int main(int argc, char* argv[]) {
 	injection.this_LoadLibraryW = (my_loadLibraryW)GetProcAddress(ModuleHandleW, "LoadLibraryW");
 
 	copy_str(injection.dateinject_dll_path, dllPath.c_str());
-	strcpy(injection.dll_entrypoint_funcname, "InitDate");
+	if (strcpy_s(injection.dll_entrypoint_funcname, 9, "InitDate")) {
+		std::cerr << "Failed to copy entrypoint function name\n";
+		TerminateProcess(pi.hProcess, 1);
+		return 1;
+	}
 	injection.datearg = fakeFileTime;
 
 	// Inject custom function + args to call InitDate
