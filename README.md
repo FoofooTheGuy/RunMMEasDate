@@ -1,4 +1,7 @@
+<img width="64" height="64" alt="RunMMEasDate" src="https://github.com/user-attachments/assets/37384720-0614-4430-ab1d-23595ca8236f" />
+
 # RunMMEasDate
+
 A customized version of [JackKuo-tw's RunAsDate](https://github.com/JackKuo-tw/RunAsDate) designed to be a forwarder for Mobiclip Multicore Encoder.
 
 Dependencies:
