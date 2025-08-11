@@ -4,11 +4,11 @@
 
 A customized version of [JackKuo-tw's RunAsDate](https://github.com/JackKuo-tw/RunAsDate) designed to be a forwarder for Mobiclip Multicore Encoder.
 
-Dependencies:
+Dependencies
 --
-Mobiclip Multicore Encoder
+Mobiclip Multicore Encoder (Duh)
 
-Usage:
+Usage
 --
 `RunMMEasDate [PARAM]...` (Just like MME)
 
@@ -21,3 +21,4 @@ Credits
 - [Nir Sofer](https://www.nirsoft.net): Inspiration and example
 - [JackKuo-tw](https://github.com/JackKuo-tw): Source material
 - [ZeroSkill1](https://github.com/ZeroSkill1): Reverse engineering expertise
+- The icon is a combination of the MME icon and [A rewind icon](https://commons.wikimedia.org/wiki/File:Eo_circle_grey_white_rewind.svg) from Wikimedia
