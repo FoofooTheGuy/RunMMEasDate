@@ -21,4 +21,4 @@ Credits
 - [Nir Sofer](https://www.nirsoft.net): Inspiration and example
 - [JackKuo-tw](https://github.com/JackKuo-tw): Source material
 - [ZeroSkill1](https://github.com/ZeroSkill1): Reverse engineering expertise
-- The icon is a combination of the MME icon and [A rewind icon](https://commons.wikimedia.org/wiki/File:Eo_circle_grey_white_rewind.svg) from Wikimedia
+- The icon used is a combination of the MME icon and [a rewind icon from Wikimedia](https://commons.wikimedia.org/wiki/File:Eo_circle_grey_white_rewind.svg)
