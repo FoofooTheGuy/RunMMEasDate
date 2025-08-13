@@ -3,8 +3,10 @@ cmake_minimum_required(VERSION 3.10)
 # Project name and version
 project(RunMMEasDate VERSION 1.0 LANGUAGES CXX)
 
+set(EXE_NAME "Mobiclip Multicore Encoder Forwarder")
+
 # Disable just_my_code_debugging
-set (CMAKE_VS_JUST_MY_CODE_DEBUGGING 0)
+set(CMAKE_VS_JUST_MY_CODE_DEBUGGING 0)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 11)
@@ -95,13 +97,13 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/resources/${PROJECT_NAME}.rc
 	"    BLOCK \"000004b0\"\n"
 	"    BEGIN\n"
 	"      VALUE \"CompanyName\", \"FoofooTheGuy\"\n"
-	"      VALUE \"FileDescription\", \"Forwarder for MME\"\n"
+	"      VALUE \"FileDescription\", \"Run MME as Date\"\n"
 	"      VALUE \"FileVersion\", \"1,0,0,0\"\n"
 	"      VALUE \"InternalName\", \"${PROJECT_NAME}\"\n"
 	"      VALUE \"LegalCopyright\", \"\"\n"
 	"      VALUE \"LegalTrademarks1\", \"\"\n"
 	"      VALUE \"LegalTrademarks2\", \"\"\n"
-	"      VALUE \"OriginalFilename\", \"${PROJECT_NAME}.exe\"\n"
+	"      VALUE \"OriginalFilename\", \"${EXE_NAME}.exe\"\n"
 	"      VALUE \"ProductName\", \"${PROJECT_NAME}\"\n"
 	"      VALUE \"ProductVersion\", \"1,0,0\"\n"
 	"    END\n"
@@ -116,6 +118,7 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/resources/${PROJECT_NAME}.rc
 
 # Create the executable
 add_executable(RunMMEasDate ${EXE_SOURCES})
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${EXE_NAME})
 
 # Disable console window https://stackoverflow.com/a/58079971
 target_link_options(RunMMEasDate PRIVATE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
