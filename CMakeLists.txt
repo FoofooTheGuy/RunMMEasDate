@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 # Project name and version
 project(RunMMEasDate VERSION 1.0 LANGUAGES CXX)
 
-set(EXE_NAME "Mobiclip Multicore Encoder Forwarder")
+set(EXE_NAME "MobiclipMulticoreEncoderForwarder")
 
 # Disable just_my_code_debugging
 set(CMAKE_VS_JUST_MY_CODE_DEBUGGING 0)
@@ -83,7 +83,7 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/resources/${PROJECT_NAME}.rc
 	"IDI_APPLICATION ICON DISCARDABLE \"${ABSOLUTE_PATH_FILE_ICON}\"\n\n"
 	"VS_VERSION_INFO VERSIONINFO\n"
 	" FILEVERSION 1,0,0,0\n"
-	" PRODUCTVERSION 1,0,0\n"
+	" PRODUCTVERSION 1,0,0,0\n"
 	" FILEFLAGSMASK 0x0L\n"
 	"#if !defined(NDEBUG)\n"
 	" FILEFLAGS VS_FF_DEBUG\n"
@@ -97,15 +97,15 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/resources/${PROJECT_NAME}.rc
 	"    BLOCK \"000004b0\"\n"
 	"    BEGIN\n"
 	"      VALUE \"CompanyName\", \"FoofooTheGuy\"\n"
-	"      VALUE \"FileDescription\", \"Run MME as Date\"\n"
+	"      VALUE \"FileDescription\", \"Mobiclip Multicore Encoder Forwarder\"\n"
 	"      VALUE \"FileVersion\", \"1,0,0,0\"\n"
 	"      VALUE \"InternalName\", \"${PROJECT_NAME}\"\n"
 	"      VALUE \"LegalCopyright\", \"\"\n"
 	"      VALUE \"LegalTrademarks1\", \"\"\n"
 	"      VALUE \"LegalTrademarks2\", \"\"\n"
 	"      VALUE \"OriginalFilename\", \"${EXE_NAME}.exe\"\n"
-	"      VALUE \"ProductName\", \"${PROJECT_NAME}\"\n"
-	"      VALUE \"ProductVersion\", \"1,0,0\"\n"
+	"      VALUE \"ProductName\", \"Mobiclip Multicore Encoder Forwarder\"\n"
+	"      VALUE \"ProductVersion\", \"1,0,0,0\"\n"
 	"    END\n"
 	"  END\n"
 	"  BLOCK \"VarFileInfo\"\n"
