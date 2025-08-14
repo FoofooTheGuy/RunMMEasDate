@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 project(RunMMEasDate VERSION 1.0 LANGUAGES CXX)
 
 set(EXE_NAME "MobiclipMulticoreEncoderForwarder")
+set(PRODUCT_NAME "Mobiclip Multicore Encoder Forwarder")
 
 # Disable just_my_code_debugging
 set(CMAKE_VS_JUST_MY_CODE_DEBUGGING 0)
@@ -97,14 +98,14 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/resources/${PROJECT_NAME}.rc
 	"    BLOCK \"000004b0\"\n"
 	"    BEGIN\n"
 	"      VALUE \"CompanyName\", \"FoofooTheGuy\"\n"
-	"      VALUE \"FileDescription\", \"Mobiclip Multicore Encoder Forwarder\"\n"
+	"      VALUE \"FileDescription\", \"${PRODUCT_NAME}\"\n"
 	"      VALUE \"FileVersion\", \"1,0,0,0\"\n"
 	"      VALUE \"InternalName\", \"${PROJECT_NAME}\"\n"
 	"      VALUE \"LegalCopyright\", \"\"\n"
 	"      VALUE \"LegalTrademarks1\", \"\"\n"
 	"      VALUE \"LegalTrademarks2\", \"\"\n"
 	"      VALUE \"OriginalFilename\", \"${EXE_NAME}.exe\"\n"
-	"      VALUE \"ProductName\", \"Mobiclip Multicore Encoder Forwarder\"\n"
+	"      VALUE \"ProductName\", \"${PRODUCT_NAME}\"\n"
 	"      VALUE \"ProductVersion\", \"1,0,0,0\"\n"
 	"    END\n"
 	"  END\n"
