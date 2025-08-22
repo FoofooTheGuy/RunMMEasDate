@@ -12,6 +12,13 @@ Usage
 --
 `MobiclipMulticoreEncoderForwarder [PARAM]...` (Just like MME)
 
+Installation
+--
+1. Install Mobiclip Multicore Encoder
+   - Optional: Uncheck the shortcut components before clicking 'Install' and manually create some shortcuts to this forwarder
+3. Install the [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist)
+4. Run `MobiclipMulticoreEncoderForwarder.exe`
+
 Compilation
 --
 1. Download and install [CMake](https://cmake.org/), [Git](https://git-scm.com/downloads/win), and [Microsoft Visual Studio](https://visualstudio.microsoft.com/) with the `Desktop development with C++` workload
