@@ -10,7 +10,7 @@ Mobiclip Multicore Encoder (Duh)
 
 Usage
 --
-`RunMMEasDate [PARAM]...` (Just like MME)
+`MobiclipMulticoreEncoderForwarder [PARAM]...` (Just like MME)
 
 But How?
 --
