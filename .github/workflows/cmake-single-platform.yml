@@ -45,30 +45,3 @@ jobs:
       with:
         name: binary
         path: ${{github.workspace}}/build/${{env.BUILD_TYPE}}/MobiclipMulticoreEncoderForwarder.exe
-        
-  # from https://www.geeksforgeeks.org/devops/download-github-actions-artifacts/
-  deploy:
-  
-    runs-on: windows-latest
-    needs: build
-
-    steps:
-    - name: Download Binary
-      uses: actions/download-artifact@v4
-      with:
-        name: binary
-        path: ${{github.workspace}}/build/${{env.BUILD_TYPE}}
-
-    - name: List Build Directory
-      run: dir ${{github.workspace}}/build/${{env.BUILD_TYPE}}
-
-    # The src
-    - name: Download Source Code
-      uses: actions/download-artifact@v4
-      with:
-        name: src
-        path: ${{github.workspace}}
-
-    - name: List Build Directory
-      run: dir ${{github.workspace}}
-    
