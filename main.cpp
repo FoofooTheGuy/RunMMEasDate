@@ -1,8 +1,8 @@
-#include <Windows.h>
+#include <windows.h>
 #include <iostream>
 #include <vector>
 #include <string>
-#include <Psapi.h>
+#include <psapi.h>
 
 //https://stackoverflow.com/a/10738141
 std::wstring s2ws(const std::string& str) {
@@ -202,7 +202,7 @@ int main(int argc, char* argv[]) {
 
 	// Inject custom function + args to call InitDate
 	LPVOID remote_getInitDateFunc = nullptr;
-	if (!WriteRemoteMemory(pi.hProcess, remote_getInitDateFunc, getInitDateFunc, 0x400, PAGE_EXECUTE_READWRITE)) {
+	if (!WriteRemoteMemory(pi.hProcess, remote_getInitDateFunc, reinterpret_cast<LPVOID *>(getInitDateFunc), 0x400, PAGE_EXECUTE_READWRITE)) {
 		std::cerr << "Failed to write function.\n";
 		TerminateProcess(pi.hProcess, 1);
 		return 1;
