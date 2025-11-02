@@ -61,8 +61,8 @@ jobs:
       run: |
            sudo apt-get update -y
            sudo apt install -y \
-           gcc-mingw-w64-x86-64 \
-           g++-mingw-w64-x86-64
+           g++-mingw-w64-ucrt64 \
+           gcc-mingw-w64-ucrt64
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_TOOLCHAIN_FILE=TC-mingw.cmake
