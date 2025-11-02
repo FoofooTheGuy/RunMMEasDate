@@ -1,7 +1,6 @@
 #include <windows.h>
 #include <iostream>
 #include <psapi.h>
-#include <wchar.h>
 #include <vector>
 #include <string>
 
