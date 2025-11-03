@@ -153,16 +153,17 @@ int main(int argc, char* argv[]) {
 	SystemTimeToFileTime(&sysTime, &fakeFileTime);
 
 	// get MME path
-	wchar_t* MMEpath;
-	size_t MMEpathLength;
-	errno_t err = _wdupenv_s( &MMEpath, &MMEpathLength, L"MOBICLIP_MULTICORE_ENCODER_PATH" );
-	if (err) {
+	//wchar_t* MMEpath;
+	//size_t MMEpathLength;
+	//errno_t err = _wdupenv_s( &MMEpath, &MMEpathLength, L"MOBICLIP_MULTICORE_ENCODER_PATH" );
+	const char* MMEpath = std::getenv("MOBICLIP_MULTICORE_ENCODER_PATH");
+	if (!MMEpath) {
 		std::cerr << "Failed to get MME path\n";
 		return 1;
 	}
 	
 	// MMEpath + L"\\MobiclipMulticoreEncoder.exe ";
-	std::wstring CmdLine(MMEpath);
+	std::wstring CmdLine = s2ws(std::string(MMEpath));
 	CmdLine += L"\\MobiclipMulticoreEncoder.exe ";
 
 	
