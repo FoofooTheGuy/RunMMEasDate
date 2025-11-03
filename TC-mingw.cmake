@@ -15,4 +15,4 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 # statically link things for no extra dll
-add_link_options(-static -mwindows)
+add_link_options(-static)
