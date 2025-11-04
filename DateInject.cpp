@@ -19,21 +19,25 @@ void WINAPI MyGetLocalTime(LPSYSTEMTIME lpSystemTime) {
 	OutputDebugStringW(L"[RunAsDate] Hooked GetLocalTime called");
 	*lpSystemTime = g_fakeSystemTime;
 }
+
 // GetSystemTime
 void WINAPI MyGetSystemTime(LPSYSTEMTIME lpSystemTime) {
 	OutputDebugStringW(L"[RunAsDate] Hooked GetSystemTime called");
 	*lpSystemTime = g_fakeSystemTime;
 }
+
 // GetSystemTimeAsFileTime
 void WINAPI MyGetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime) {
 	OutputDebugStringW(L"[RunAsDate] Hooked GetSystemTimeAsFileTime called");
 	*lpSystemTimeAsFileTime = g_fakeFileTime;
 }
+
 // GetSystemTimePreciseAsFileTime
 void WINAPI MyGetSystemTimePreciseAsFileTime(LPFILETIME lpSystemTimeAsFileTime) {
 	OutputDebugStringW(L"[RunAsDate] Hooked GetSystemTimePreciseAsFileTime called");
 	*lpSystemTimeAsFileTime = g_fakeFileTime;
 }
+
 // NtQuerySystemTime
 /*ULONGLONG WINAPI MyNtQuerySystemTime(LPFILETIME SystemTime) {
 	OutputDebugStringW(L"[RunAsDate] Hooked NtQuerySystemTime called");
@@ -45,19 +49,19 @@ extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime) {
 	OutputDebugStringW(L"[RunAsDate] InitDate called in target process");
 	g_fakeFileTime = *pFakeTime;
 	FileTimeToSystemTime(&g_fakeFileTime, &g_fakeSystemTime);
-	
+
 	if (g_hooked)
 		return;
-	
+
 	OutputDebugStringW(L"[RunAsDate] InitDate called in target process");
 	if (MH_Initialize() != MH_OK)
 		return;
-	
+
 	// GetLocalTime
 	OutputDebugStringW(L"[RunAsDate] Create Hook GetLocalTime");
 	if (MH_CreateHook(reinterpret_cast<LPVOID *>(&GetLocalTime), reinterpret_cast<LPVOID *>(&MyGetLocalTime), reinterpret_cast<LPVOID *>(&original_GetLocalTime)) != MH_OK)
 		return;
-	
+
 	OutputDebugStringW(L"[RunAsDate] Enable Hook GetLocalTime");
 	if (MH_EnableHook(reinterpret_cast<LPVOID *>(&GetLocalTime)) != MH_OK)
 		return;
@@ -66,16 +70,16 @@ extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime) {
 	OutputDebugStringW(L"[RunAsDate] Create Hook GetSystemTime");
 	if (MH_CreateHook(reinterpret_cast<LPVOID *>(&GetSystemTime), reinterpret_cast<LPVOID *>(&MyGetSystemTime), reinterpret_cast<LPVOID *>(&original_GetSystemTime)) != MH_OK)
 		return;
-	
+
 	OutputDebugStringW(L"[RunAsDate] Enable Hook GetSystemTime");
 	if (MH_EnableHook(reinterpret_cast<LPVOID *>(&GetSystemTime)) != MH_OK)
 		return;
-	
+
 	// GetSystemTimeAsFileTime
 	OutputDebugStringW(L"[RunAsDate] Create Hook GetSystemTimeAsFileTime");
 	if (MH_CreateHook(reinterpret_cast<LPVOID *>(&GetSystemTimeAsFileTime), reinterpret_cast<LPVOID *>(&MyGetSystemTimeAsFileTime), reinterpret_cast<LPVOID *>(&original_GetSystemTimeAsFileTime)) != MH_OK)
 		return;
-	
+
 	OutputDebugStringW(L"[RunAsDate] Enable Hook GetSystemTimeAsFileTime");
 	if (MH_EnableHook(reinterpret_cast<LPVOID *>(&GetSystemTimeAsFileTime)) != MH_OK)
 		return;
@@ -84,7 +88,7 @@ extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime) {
 	OutputDebugStringW(L"[RunAsDate] Create Hook GetSystemTimePreciseAsFileTime");
 	if (MH_CreateHook(reinterpret_cast<LPVOID *>(&GetSystemTimePreciseAsFileTime), reinterpret_cast<LPVOID *>(&MyGetSystemTimePreciseAsFileTime), reinterpret_cast<LPVOID *>(&original_GetSystemTimePreciseAsFileTime)) != MH_OK)
 		return;
-	
+
 	OutputDebugStringW(L"[RunAsDate] Enable Hook GetSystemTimePreciseAsFileTime");
 	if (MH_EnableHook(reinterpret_cast<LPVOID *>(&GetSystemTimePreciseAsFileTime)) != MH_OK)
 		return;
@@ -93,10 +97,10 @@ extern "C" __declspec(dllexport) void InitDate(FILETIME *pFakeTime) {
 	/*OutputDebugStringW(L"[RunAsDate] Create Hook NtQuerySystemTime");
 	if (MH_CreateHook(&NtQuerySystemTime, &MyNtQuerySystemTime, reinterpret_cast<LPVOID *>(&original_NtQuerySystemTime)) != MH_OK)
 		return;
-	
+
 	OutputDebugStringW(L"[RunAsDate] Enable Hook NtQuerySystemTime");
 	if (MH_EnableHook(&NtQuerySystemTime) != MH_OK)
 		return;*/
-	
+
 	g_hooked = true;
 }

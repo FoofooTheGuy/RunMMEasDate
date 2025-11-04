@@ -63,7 +63,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
 
 	// Cast lParam to a pointer to our data because it doesn't know what the type is beyond just LPARAM
 	WindowData* data = reinterpret_cast<WindowData*>(lParam);
-	
+
 	if (dwProcessId == data->dwTargetProcessId) {
 		data->hwnds->push_back(hwnd);
 	}
@@ -120,15 +120,15 @@ int main(int argc, char* argv[]) {
 		freopen_s(&pConsole, "CONOUT$", "w", stdout);
 		freopen_s(&pConsole, "CONOUT$", "w", stderr);
 	}
-	
+
 	// Write DLL to temp
 	std::wstring dllPath = L"";
 	wchar_t tempPath[MAX_PATH + 1];
-	
+
 	DWORD tempLen = GetTempPathW(MAX_PATH, tempPath);
 	if (!tempLen)
 		return 1;
-	
+
 	if (tempLen + sizeof(dllPath) < MAX_PATH) {
 		wchar_t* backslash = wcsrchr(tempPath, L'\\');
 		if (backslash)
@@ -137,16 +137,16 @@ int main(int argc, char* argv[]) {
 		dllPath += L"\\DateInject.dll";
 	}
 	std::wcout << dllPath << std::endl;
-	
+
 	if(dllPath.empty()) {
 		std::cerr << "Failed to get Temp path\n";
 		return 1;
 	}
-	
+
 	DWORD WroteDLL = WriteResourceToFile("DATEINJECTDLL", RT_RCDATA, dllPath.c_str());
 	if(WroteDLL)
 		std::cerr << "Failed to write DLL: " << WroteDLL << '\n';
-	
+
 	// Create fake FILETIME
 	SYSTEMTIME sysTime = {2010, 1, 0, 1, 0, 0, 0, 0};
 	FILETIME fakeFileTime;
@@ -161,18 +161,18 @@ int main(int argc, char* argv[]) {
 		std::cerr << "Failed to get MME path\n";
 		return 1;
 	}
-	
+
 	// MMEpath + L"\\MobiclipMulticoreEncoder.exe ";
 	std::wstring CmdLine = s2ws(std::string(MMEpath));
 	CmdLine += L"\\MobiclipMulticoreEncoder.exe ";
 
-	
+
 	// Forward args to CmdLine
 	for (int i = 1; i < argc; i++) {
 		CmdLine += s2ws(std::string(argv[i]));
 		CmdLine += ' ';
 	}
-	
+
 	std::wcout << CmdLine << std::endl;
 
 	// Create suspended process
@@ -186,9 +186,9 @@ int main(int argc, char* argv[]) {
 	// Get InitDate function in remote process
 	inject_ctx injection;
 	memset(&injection, 0, sizeof(inject_ctx));
-	
+
 	HMODULE ModuleHandleW = GetModuleHandleW(L"kernel32.dll");
-	
+
 	// Set up args for custom function
 	injection.this_GetProcAddress = (my_GetProcAddress)GetProcAddress(ModuleHandleW, "GetProcAddress");
 	injection.this_LoadLibraryW = (my_loadLibraryW)GetProcAddress(ModuleHandleW, "LoadLibraryW");
@@ -208,14 +208,14 @@ int main(int argc, char* argv[]) {
 		TerminateProcess(pi.hProcess, 1);
 		return 1;
 	}
-	
+
 	LPVOID remote_getIDFuncArg = nullptr;
 	if (!WriteRemoteMemory(pi.hProcess, remote_getIDFuncArg, &injection, sizeof(inject_ctx), PAGE_EXECUTE_READWRITE)) {
 		std::cerr << "Failed to write args for function.\n";
 		TerminateProcess(pi.hProcess, 1);
 		return 1;
 	}
-	
+
 	// Call function in new thread
 	HANDLE RemoteThread = CreateRemoteThread(pi.hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)remote_getInitDateFunc, remote_getIDFuncArg, 4, NULL);
 	if (RemoteThread) {
@@ -226,14 +226,14 @@ int main(int argc, char* argv[]) {
 
 	// Resume main thread
 	ResumeThread(pi.hThread);
-	
+
 	// Attempt to bring the windows to the foreground
 	WaitForInputIdle(pi.hProcess, INFINITE);
-	
+
 	Sleep(200);//let's just hope the splash screen takes less than 200ms
-	
+
 	std::vector<HWND> Windows = GetHwndsFromProcessHandle(pi.hProcess);
-	
+
 	for (const auto &window : Windows) {
 		if (!SetForegroundWindow(window))
 			std::cerr << "Failed to set foreground window\n";
