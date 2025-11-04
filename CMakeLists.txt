@@ -5,6 +5,7 @@ project(RunMMEasDate VERSION 1.0 LANGUAGES CXX)
 
 set(EXE_NAME "MobiclipMulticoreEncoderForwarder")
 set(PRODUCT_NAME "Mobiclip Multicore Encoder Forwarder")
+set(PRODUCT_VER "1,0,0,0")
 
 # Disable just_my_code_debugging
 set(CMAKE_VS_JUST_MY_CODE_DEBUGGING 0)
@@ -100,14 +101,14 @@ if (MSVC)
 		"    BEGIN\n"
 		"      VALUE \"CompanyName\", \"FoofooTheGuy\"\n"
 		"      VALUE \"FileDescription\", \"${PRODUCT_NAME}\"\n"
-		"      VALUE \"FileVersion\", \"1,0,0,0\"\n"
+		"      VALUE \"FileVersion\", \"${PRODUCT_VER}\"\n"
 		"      VALUE \"InternalName\", \"${PROJECT_NAME}\"\n"
 		"      VALUE \"LegalCopyright\", \"\"\n"
 		"      VALUE \"LegalTrademarks1\", \"\"\n"
 		"      VALUE \"LegalTrademarks2\", \"\"\n"
 		"      VALUE \"OriginalFilename\", \"${EXE_NAME}.exe\"\n"
 		"      VALUE \"ProductName\", \"${PRODUCT_NAME}\"\n"
-		"      VALUE \"ProductVersion\", \"1,0,0,0\"\n"
+		"      VALUE \"ProductVersion\", \"${PRODUCT_VER}\"\n"
 		"    END\n"
 		"  END\n"
 		"  BLOCK \"VarFileInfo\"\n"
@@ -154,14 +155,14 @@ else()
 		"    BEGIN\n"
 		"      VALUE \"CompanyName\", \"FoofooTheGuy\"\n"
 		"      VALUE \"FileDescription\", \"${PRODUCT_NAME}\"\n"
-		"      VALUE \"FileVersion\", \"1,0,0,0\"\n"
+		"      VALUE \"FileVersion\", \"${PRODUCT_VER}\"\n"
 		"      VALUE \"InternalName\", \"${PROJECT_NAME}\"\n"
 		"      VALUE \"LegalCopyright\", \"\"\n"
 		"      VALUE \"LegalTrademarks1\", \"\"\n"
 		"      VALUE \"LegalTrademarks2\", \"\"\n"
 		"      VALUE \"OriginalFilename\", \"${EXE_NAME}.exe\"\n"
 		"      VALUE \"ProductName\", \"${PRODUCT_NAME}\"\n"
-		"      VALUE \"ProductVersion\", \"1,0,0,0\"\n"
+		"      VALUE \"ProductVersion\", \"${PRODUCT_VER}\"\n"
 		"    END\n"
 		"  END\n"
 		"  BLOCK \"VarFileInfo\"\n"
