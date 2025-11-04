@@ -57,7 +57,7 @@ jobs:
       run: git submodule update --init --recursive
 
     # https://www.mingw-w64.org/getting-started/debian/#__tabbed_1_1
-    - name: Install mingw64
+    - name: Install mingw-w64
       run: |
            sudo apt install -y mingw-w64
 
