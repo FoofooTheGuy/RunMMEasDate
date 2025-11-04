@@ -47,7 +47,7 @@ jobs:
         path: ${{github.workspace}}/build/${{env.BUILD_TYPE}}/MobiclipMulticoreEncoderForwarder.exe
 
   # The same thing as the first job but we use ubuntu and mingw64
-  mingw64:
+  mingw-w64:
     runs-on: ubuntu-latest
 
     steps:
