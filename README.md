@@ -28,7 +28,7 @@ Compilation
 
 But How?
 --
-When you run this program, it will locate MME via its environment variable, `MOBICLIP_MULTICORE_ENCODER_PATH`. It then creates the process by giving it the path to MME and the parameters given to the forwarder. Next, it injects a custom function to load a custom DLL that calls the `InitDate` function. Finally, `InitDate` uses [minhook](https://github.com/TsudaKageyu/minhook/tree/565968b28583221751cc2810e09ea621745fc3a3) to override a few of the [Windows API Time Functions](https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-functions). Since the fake time is set to midnight 1/1/2010, every license file will work no matter what year it really is.
+When you run this program, it will locate MME via its environment variable, `MOBICLIP_MULTICORE_ENCODER_PATH`. It then creates the process by giving it the path to MME and the parameters given to the forwarder. Next, it injects a custom function to load a custom DLL that calls the `InitDate` function. Finally, `InitDate` uses [MinHook](https://github.com/TsudaKageyu/minhook/tree/565968b28583221751cc2810e09ea621745fc3a3) to override a few of the [Windows API Time Functions](https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-functions). Since the fake time is set to midnight 1/1/2010, every license file will work no matter what year it really is.
 
 Credits
 --
