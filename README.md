@@ -16,8 +16,7 @@ Installation
 --
 1. Install Mobiclip Multicore Encoder
    - Optional: Uncheck the shortcut components before clicking 'Install' and manually create some shortcuts to this forwarder
-3. Install the [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist)
-4. Run `MobiclipMulticoreEncoderForwarder.exe`
+2. Run `MobiclipMulticoreEncoderForwarder.exe`
 
 Compilation
 --
