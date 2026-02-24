@@ -169,8 +169,9 @@ int main(int argc, char* argv[]) {
 
 	// Forward args to CmdLine
 	for (int i = 1; i < argc; i++) {
+		CmdLine += '"';
 		CmdLine += s2ws(std::string(argv[i]));
-		CmdLine += ' ';
+		CmdLine += L"\" ";
 	}
 
 	std::wcout << CmdLine << std::endl;
