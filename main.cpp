@@ -112,7 +112,7 @@ static DWORD getInitDateFunc(inject_ctx *lpThreadParameter) {
 	return 0;
 }
 
-int main(int argc, char* argv[]) {
+int wmain(int argc, wchar_t* argv[]) {
 	// Enable stdout when running in cmd
 	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 		// If a console is attached, redirect stdout/stderr to it
@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
 	// Forward args to CmdLine
 	for (int i = 1; i < argc; i++) {
 		CmdLine += '"';
-		CmdLine += s2ws(std::string(argv[i]));
+		CmdLine += std::wstring(argv[i]);
 		CmdLine += L"\" ";
 	}
 
