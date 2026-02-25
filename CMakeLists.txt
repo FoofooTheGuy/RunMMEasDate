@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
+# https://stackoverflow.com/a/53635241
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+
 # Project name and version
 project(RunMMEasDate VERSION 1.0 LANGUAGES CXX)
 
@@ -180,7 +183,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${EXE_NAME})
 
 # Disable console window https://stackoverflow.com/a/58079971
 if (MSVC)
-	target_link_options(RunMMEasDate PRIVATE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
+	target_link_options(RunMMEasDate PRIVATE "/SUBSYSTEM:WINDOWS" "/ENTRY:wmainCRTStartup")
 endif()
 
 # Link the executable to required libraries if needed
