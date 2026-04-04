@@ -20,13 +20,13 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Init Submodules
       run: git submodule update --init --recursive
 
     - name: Upload Source Code Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: src
         path: ${{github.workspace}}
@@ -41,7 +41,7 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Upload Executable Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: binary
         path: ${{github.workspace}}/build/${{env.BUILD_TYPE}}/MobiclipMulticoreEncoderForwarder.exe
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Init Submodules
       run: git submodule update --init --recursive
@@ -68,7 +68,7 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Upload Executable Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: cross-compile-test
         path: ${{github.workspace}}/build/MobiclipMulticoreEncoderForwarder.exe
