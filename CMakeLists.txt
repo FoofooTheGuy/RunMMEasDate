@@ -8,7 +8,7 @@ project(RunMMEasDate VERSION 1.0 LANGUAGES CXX)
 
 set(EXE_NAME "MobiclipMulticoreEncoderForwarder")
 set(PRODUCT_NAME "Mobiclip Multicore Encoder Forwarder")
-set(PRODUCT_VER "1,0,0,1")
+set(PRODUCT_VER "1,0,0,2")
 
 # Disable just_my_code_debugging
 set(CMAKE_VS_JUST_MY_CODE_DEBUGGING 0)
