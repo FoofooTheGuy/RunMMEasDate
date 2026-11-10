@@ -2,7 +2,7 @@
 
 # RunMMEasDate
 
-A customized version of [JackKuo-tw's RunAsDate](https://github.com/JackKuo-tw/RunAsDate) designed to be a forwarder for Mobiclip Multicore Encoder.
+A customized version of [JackKuo-tw's RunAsDate](https://github.com/JackKuo-tw/RunAsDate) designed to be a forwarder for Mobiclip Multicore Encoder. As stated by Kuo, "Most of the code has been generated with assistance from AI tools like Cline (Grok-3), Gemini, and ChatGPT." However, I had to manually redo pretty much everything —with the help of [ZeroSkill1](https://github.com/ZeroSkill1) for finding some symbols— because that did not really work ([96c78ab](https://github.com/FoofooTheGuy/RunMMEasDate/commit/96c78ab973d5bd23e73670554155a2ee1f458226))
 
 Dependencies
 --
